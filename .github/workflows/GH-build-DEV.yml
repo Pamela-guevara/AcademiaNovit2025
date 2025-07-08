@@ -31,6 +31,7 @@ jobs:
     - name: Send mail
       uses: dawidd6/action-send-mail@v6      
       with:                
+        server_address: ${{ secrets.EMAIL_HOST }}
         # Server port, default 25:
         server_port: ${{ secrets.EMAIL_PORT }}        
         # Optional (recommended) mail server username:
