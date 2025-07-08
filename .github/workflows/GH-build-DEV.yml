@@ -1,0 +1,47 @@
+
+name: GH-build-DEV
+
+# Configure events for all branches
+on:
+  push:
+    branches: [ "main", "staging", "development" ]
+  pull_request:
+    branches: [ "main", "staging", "development" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+  # Mailing
+    - name: Send mail
+      uses: dawidd6/action-send-mail@v6      
+      with:                
+        # Server port, default 25:
+        server_port: ${{ secrets.EMAIL_PORT }}        
+        # Optional (recommended) mail server username:
+        username: ${{secrets.EMAIL_LOGIN}}
+        # Optional (recommended) mail server password:
+        password: ${{secrets.EMAIL_PASS}}
+        # Required mail subject:
+        subject: Second homework - CI/CD github actions
+        # Required recipients' addresses:
+        to: ${{ secrets.EMAIL_RECEIVER }}
+        # Required sender full name (address can be skipped):
+        from: ${{ secrets.EMAIL_SENDER }}
+        # Optional plain body:
+        body: Build job of ${{github.repository}} completed successfully!
