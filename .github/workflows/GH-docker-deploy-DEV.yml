@@ -30,5 +30,8 @@ jobs:
         port: ${{ secrets.SERVER_PORT }}
         script: |
           cd AcademiaNovit2025
+          # Elimino los contenedores si ya existen en el servidor, sino sigue al docker compose
+          docker rm -f academianovit || true
           docker rm -f postgres-pam || true
+          docker compose down || true
           docker compose -f "docker-deploy.yml" up -d 
