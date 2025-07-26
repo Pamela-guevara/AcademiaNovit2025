@@ -28,4 +28,6 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
-        script: docker compose -f "docker-deploy.yml" up -d 
+        script: |
+          cd AcademiaNovit2025
+          docker compose -f "docker-deploy.yml" up -d 
