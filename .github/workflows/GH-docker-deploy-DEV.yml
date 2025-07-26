@@ -30,4 +30,5 @@ jobs:
         port: ${{ secrets.SERVER_PORT }}
         script: |
           cd AcademiaNovit2025
+          docker rm -f postgres-pam || true
           docker compose -f "docker-deploy.yml" up -d 
