@@ -14,4 +14,4 @@ COPY --from=build /publish/out ./
 
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "AcademiaNovit.dll"]
+ENTRYPOINT ["dotnet", "AcademiaNovit.dll", "--urls", "http://0.0.0.0:8080"]

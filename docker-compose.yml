@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: postgres-pam
+    image: postgres:17.5
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: tivon123
+      POSTGRES_DB: datos
+    ports:
+      - "5432:5432"
+    networks:
+      - academia
+    restart: unless-stopped
+
+  AppDocker:
+    container_name: academianovit
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    image: academianovit:1.0.0
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - academia
+    environment:
+      ConnectionStrings__DefaultConnection: Host=postgres-pam;Port=5432;Database=datos;Username=admin;Password=tivon1234
+
+networks:
+  academia:
+    external: true
