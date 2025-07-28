@@ -1,0 +1,52 @@
+name: Build and Deploy to Swarm (DEV)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  PROJECT_NAME: academianovit
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    outputs:
+      image-tag: academianovit:1.0.0
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build Docker image (local tag)
+        run: |
+          docker build -f Dockerfile -t academianovit:1.0.0 .
+
+      - name: Login to GHCR
+        run: docker login ghcr.io -u "${{ secrets.USERNAME_GH }}" -p "${{ secrets.PAT_GH }}"
+
+      - name: Tag & push image to GHCR
+        run: |
+          docker tag academianovit:1.0.0 ghcr.io/${{ secrets.USERNAME_GH }}/academianovit:1.0.0
+          docker push ghcr.io/${{ secrets.USERNAME_GH }}/academianovit:1.0.0
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Deploy stack via Docker Swarm
+        uses: serversideup/github-action-docker-swarm-deploy@v3
+        with:
+          ssh_deploy_private_key: ${{ secrets.SSH_DEPLOY_PRIVATE_KEY }}
+          ssh_deploy_user: ${{ secrets.SERVER_USERNAME }}
+          ssh_remote_hostname: ${{ secrets.SERVER_URL }}
+          ssh_remote_port: ${{ secrets.SERVER_PORT }}
+          registry: ghcr.io
+          registry-username: ${{ secrets.USERNAME_GH }}
+          registry-token: ${{ secrets.PAT_GH }}
+          stack_name: ${{ env.PROJECT_NAME }}
+          docker_compose_file_path: "-c docker-swarm.yml"
+        # opcional: si querés validar cambios en configs / .env
+        # md5_file_path: "./path/to/file"
+        # md5_variable_name: "MY_MD5"
+        # env_file_base64: ${{ secrets.ENV_FILE_BASE64 }}
