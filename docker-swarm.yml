@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:17.5
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: tivon1234
+      POSTGRES_DB: admin
+    networks:
+      - academia
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  #Persistencia de datos, aunque se elimine el contenedor
+    deploy:
+      restart_policy:
+        condition: on-failure  # Sólo se reinicia el contenedor sí falla
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  appdocker:
+    image: ghcr.io/pamela-guevara/academianovit:1.0.0
+    environment:
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=admin;Username=admin;Password=tivon1234
+    networks:
+      - academia
+    ports:
+      - target: 8080  # Puerto del contenedor
+        published: 5010  # Puerto del host
+        protocol: tcp
+        mode: ingress  # Balancea el tráfico entre réplicas (Sólo en Swarm)
+    deploy:
+      replicas: 5
+      restart_policy:
+        condition: on-failure  # 5 réplicas, solo se resetea la que falle
+      placement:
+        constraints: [node.role == manager]  # las réplicas correrán en el nodo manager
+    depends_on:
+      - postgres
+
+networks:
+  academia:
+    external: true
+
+volumes:
+  postgres_data:
+

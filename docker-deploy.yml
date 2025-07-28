@@ -13,7 +13,7 @@ services:
     networks:
       - academia
     restart: unless-stopped
-    healthcheck:
+    healthcheck:  # Healtcheck para asegurarse que la DB funcione antes que se levante la app, para evitar fallos de conexión
       test: ["CMD", "pg_isready", "-U", "admin"]
       interval: 5s
       timeout: 5s
@@ -23,10 +23,10 @@ services:
     container_name: academianovit
     depends_on:
       postgres:
-        condition: service_healthy
+        condition: service_healthy  # Es necesario que el healthchek sea aprobado para que esta condición sea true y pueda arrancar la app
     image: ghcr.io/pamela-guevara/academianovit:1.0.0
     ports:
-      - "8080:8080"
+      - "5010:8080"
     restart: unless-stopped
     pull_policy: always
     networks:
