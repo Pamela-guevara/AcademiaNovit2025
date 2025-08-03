@@ -3,13 +3,9 @@ services:
     container_name: postgres-pam
     image: postgres:17.5
     environment:
-      POSTGRES_USER: /run/secrets/db_set_user
-      POSTGRES_PASSWORD: /run/secrets/db_set_pass
-      POSTGRES_DB: /run/secrets/db_set_db
-    secrets:
-      - db_set_user
-      - db_set_pass
-      - db_set_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: tivon1234
+      POSTGRES_DB: admin
     ports:
       - "5432:5432"
     networks:
@@ -34,19 +30,7 @@ services:
     networks:
       - academia
     environment:
-      DB_CONNECTION_STRING_FILE: /run/secrets/db_conn_string
-    secrets:
-      - db_conn_string
-
-secrets:
-  db_conn_string:
-    file: ./secrets/db_conn_string.txt
-  db_set_user:
-    file: ./secrets/db_set_user.txt
-  db_set_pass:
-    file: ./secrets/db_set_pass.txt
-  db_set_db:
-    file: ./secrets/db_set_db.txt
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=admin;Username=admin;Password=tivon1234
 
 networks:
   academia:
