@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:17.5
@@ -10,10 +8,10 @@ services:
     networks:
       - academia
     volumes:
-      - postgres_data:/var/lib/postgresql/data  #Persistencia de datos, aunque se elimine el contenedor
+      - postgres_data:/var/lib/postgresql/data #Persistencia de datos, aunque se elimine el contenedor
     deploy:
       restart_policy:
-        condition: on-failure  # Sólo se reinicia el contenedor sí falla
+        condition: on-failure # Sólo se reinicia el contenedor sí falla
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin"]
       interval: 5s
@@ -27,16 +25,16 @@ services:
     networks:
       - academia
     ports:
-      - target: 8080  # Puerto del contenedor
-        published: 5010  # Puerto del host
+      - target: 8080 # Puerto del contenedor
+        published: 5010 # Puerto del host
         protocol: tcp
-        mode: ingress  # Balancea el tráfico entre réplicas (Sólo en Swarm)
+        mode: ingress # Balancea el tráfico entre réplicas (Sólo en Swarm)
     deploy:
       replicas: 5
       restart_policy:
-        condition: on-failure  # 5 réplicas, solo se resetea la que falle
+        condition: on-failure # 5 réplicas, solo se resetea la que falle
       placement:
-        constraints: [node.role == manager]  # las réplicas correrán en el nodo manager
+        constraints: [node.role == manager] # las réplicas correrán en el nodo manager
     depends_on:
       - postgres
 
@@ -46,4 +44,3 @@ networks:
 
 volumes:
   postgres_data:
-
