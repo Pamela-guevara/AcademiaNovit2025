@@ -37,24 +37,24 @@ services:
         constraints: [node.role == manager] # las réplicas correrán en el nodo manager
     depends_on:
       - postgres
-  
+
   node-exporter:
     image: prom/node-exporter:latest
     command:
-      - '--path.rootfs=/host'
+      - "--path.rootfs=/host"
     volumes:
-      - '/:/host:ro,rslave'
+      - "/:/host:ro,rslave"
     networks:
       - academia
     deploy:
-      mode: global  # una instancia por nodo del Swarm
+      mode: global # una instancia por nodo del Swarm
       restart_policy:
         condition: on-failure
     ports:
       - target: 9100
         published: 9100
         protocol: tcp
-        mode: host  # expone el puerto 9100 directamente en el host
+        mode: host # expone el puerto 9100 directamente en el host
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -73,10 +73,24 @@ services:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro  # Necesita acceder a los registros de docker para leer métricas
+      - /var/lib/docker/:/var/lib/docker:ro # Necesita acceder a los registros de docker para leer métricas
     networks:
       - academia
 
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - target: 9090
+        published: 9090
+        protocol: tcp
+        mode: host
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - academia
+    deploy:
+      restart_policy:
+        condition: on-failure
 
 networks:
   academia:
