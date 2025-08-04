@@ -28,15 +28,34 @@ services:
       - target: 8080 # Puerto del contenedor
         published: 5010 # Puerto del host
         protocol: tcp
-        mode: ingress # Balancea el tráfico entre réplicas (Sólo en Swarm)
+        mode: ingress # Balancea el tráfico entre réplicas
     deploy:
       replicas: 5
       restart_policy:
-        condition: on-failure # 5 réplicas, solo se resetea la que falle
+        condition: on-failure # sólo resetea la réplica que falle
       placement:
         constraints: [node.role == manager] # las réplicas correrán en el nodo manager
     depends_on:
       - postgres
+  node-exporter:
+    image: prom/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+    networks:
+      - academia
+    deploy:
+      mode: global  # una instancia por nodo del Swarm
+      restart_policy:
+        condition: on-failure
+    ports:
+      - target: 9100
+        published: 9100
+        protocol: tcp
+        mode: host  # expone el puerto 9100 directamente en el host
+
+
 
 networks:
   academia:
