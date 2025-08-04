@@ -37,6 +37,7 @@ services:
         constraints: [node.role == manager] # las réplicas correrán en el nodo manager
     depends_on:
       - postgres
+  
   node-exporter:
     image: prom/node-exporter:latest
     command:
@@ -55,6 +56,26 @@ services:
         protocol: tcp
         mode: host  # expone el puerto 9100 directamente en el host
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro  # Necesita acceder a los registros de docker para leer métricas
+    networks:
+      - academia
 
 
 networks:
