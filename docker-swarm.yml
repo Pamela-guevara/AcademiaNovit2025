@@ -92,9 +92,25 @@ services:
       restart_policy:
         condition: on-failure
 
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: host
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - academia
+    deploy:
+      restart_policy:
+        condition: on-failure
+
 networks:
   academia:
     external: true
 
 volumes:
   postgres_data:
+  grafana_data:
